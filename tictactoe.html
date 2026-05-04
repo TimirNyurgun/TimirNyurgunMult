@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Крестики-нолики | Тимир уонна Ньургун</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Montserrat Alternates', sans-serif;
+            background-image: url('img/background.png');
+            background-size: cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 140px;
+        }
+        .container { max-width: 600px; margin: 0 auto; padding: 0 20px; flex: 1; }
+        .header { background: transparent; padding: 15px 0; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; }
+        .menu-wrapper { background: white; border-radius: 60px; border: 2px solid #6bb5e8; padding: 10px 25px; max-width: 1400px; margin: 0 auto; width: calc(100% - 40px); box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        .header-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .nav-left { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; margin-left: 40px; }
+        .nav-right { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; position: relative; }
+        .nav-left a, .nav-right a { color: #2c6e9e; text-decoration: none; font-weight: 600; font-size: 0.95rem; padding: 6px 14px; border-radius: 40px; transition: 0.2s; white-space: nowrap; }
+        .nav-left a:hover, .nav-right a:hover { background: rgba(44, 110, 158, 0.1); }
+        .lang-wrapper { position: absolute; top: 100%; right: 0; margin-top: 15px; z-index: 100; }
+        .lang-btn-header { background: rgba(44, 110, 158, 0.15); border: 1.5px solid #2c6e9e; color: #2c6e9e; padding: 6px 14px; border-radius: 40px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s; font-family: inherit; white-space: nowrap; }
+        .lang-btn-header:hover { background: rgba(44, 110, 158, 0.3); transform: scale(1.02); }
+        .sun-block { position: absolute; top: 95%; left: 50%; transform: translate(-50%, -50%); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .sun-icon { width: 300px; height: 250px; object-fit: contain; transition: transform 0.3s ease; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); position: relative; }
+        .sun-text { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; white-space: nowrap; pointer-events: none; }
+        .sun-text .line1, .sun-text .line2 { font-size: 0.9rem; font-weight: 700; color: #2c6e9e; display: block; margin-bottom: 2px; }
+        .content-card { background: rgba(255,255,255,0.15); border-radius: 40px; padding: 30px; text-align: center; margin-bottom: 30px; }
+        h1 { color: #2c6e9e; margin-bottom: 20px; }
+        .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; background: rgba(255,255,255,0.2); padding: 15px; border-radius: 25px; margin-bottom: 20px; }
+        .cell { background: white; aspect-ratio: 1 / 1; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: bold; cursor: pointer; color: #2c6e9e; transition: 0.2s; }
+        .cell:hover { transform: scale(1.02); background: #f5f5f5; }
+        .game-status { font-size: 1.3rem; color: #2c6e9e; font-weight: 600; margin-bottom: 20px; }
+        .reset-btn { background: #FFB347; border: none; padding: 10px 25px; border-radius: 40px; color: #1e3b4f; font-weight: 600; cursor: pointer; font-family: inherit; margin: 5px; }
+        footer { background: rgba(30, 60, 90, 0.8); text-align: center; padding: 20px; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.2); }
+        @media (max-width: 900px) { body { padding-top: 180px; } .menu-wrapper { width: calc(100% - 20px); padding: 10px 15px; } .header-row { flex-direction: column; gap: 10px; } .nav-left, .nav-right { justify-content: center; margin-left: 0; } .lang-wrapper { position: static; margin-top: 15px; text-align: center; } .sun-block { position: relative; top: auto; left: auto; transform: none; margin: 10px auto 0; } .sun-icon { width: 200px; height: 170px; } .sun-text .line1, .sun-text .line2 { font-size: 0.7rem; } }
+        @media (max-width: 600px) { body { padding-top: 220px; } .board { gap: 8px; padding: 10px; } .cell { font-size: 2rem; } .game-status { font-size: 1rem; } }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="container" style="max-width: 1400px; margin: 0 auto; padding: 0 20px;">
+        <div class="menu-wrapper">
+            <div class="header-row">
+                <div class="nav-left">
+                    <a href="index.html" id="navHome">Главная</a>
+                    <a href="index.html#about-multik" id="navAbout">О мультсериале</a>
+                    <a href="index.html#characters-slider" id="navCharacters">Персонажи</a>
+                </div>
+                <div class="nav-right">
+                    <a href="mypage.html" id="navInteractive">Интерактив</a>
+                    <a href="watch.html" id="navWatch">Смотреть</a>
+                    <a href="index.html#contact" id="navContacts">Контакты</a>
+                    <div class="lang-wrapper">
+                        <button class="lang-btn-header" id="langToggle">🇷🇺 Якутский</button>
+                    </div>
+                </div>
+            </div>
+            <div class="sun-block">
+                <img src="img/sun.png" alt="Солнце" class="sun-icon">
+                <div class="sun-text">
+                    <span class="line1" id="sunLine1">Тимир уонна</span>
+                    <span class="line2" id="sunLine2">Ньургун</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main style="flex: 1;">
+    <div class="container">
+        <div class="content-card">
+            <h1 id="gameTitle">❌ Крестики-нолики ⭕</h1>
+            <div class="board" id="board"></div>
+            <div class="game-status" id="gameStatus">Ваш ход (X)</div>
+            <button class="reset-btn" id="resetGame">🔄 Новая игра</button>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <p id="footerText">© 2025 «Тимир уонна Ньургун» | Играй, рисуй и познавай!</p>
+</footer>
+
+<script>
+    const translations = {
+        ru: {
+            navHome: "Главная", navAbout: "О мультсериале", navCharacters: "Персонажи",
+            navInteractive: "Интерактив", navWatch: "Смотреть", navContacts: "Контакты",
+            sunLine1: "Тимир уонна", sunLine2: "Ньургун",
+            gameTitle: "❌ Крестики-нолики ⭕",
+            yourTurn: "Ваш ход (X)", aiTurn: "Ход ИИ (O)...",
+            win: "🎉 Ты выиграл! 🎉", aiWin: "🤖 ИИ выиграл!",
+            draw: "Ничья!", resetBtn: "🔄 Новая игра",
+            footer: "© 2025 «Тимир уонна Ньургун» | Играй, рисуй и познавай!",
+            langBtn: "🇸🇦 Саха тыла"
+        },
+        sah: {
+            navHome: "Сүрүн сирэй", navAbout: "Ойуулук туһунан", navCharacters: "Дьоруойдар",
+            navInteractive: "Оонньуулар", navWatch: "Көрүөххэ", navContacts: "Билсэр ситим",
+            sunLine1: "Тимир уонна", sunLine2: "Ньургун",
+            gameTitle: "❌ Кириэстник-нолик ⭕",
+            yourTurn: "Эн хамсаныыҥ (X)", aiTurn: "ИИ хамсаныыта (O)...",
+            win: "🎉 Эн кыайдың! 🎉", aiWin: "🤖 ИИ кыайда!",
+            draw: "Тэҥнэһии!", resetBtn: "🔄 Саҥа оонньуу",
+            footer: "© 2025 «Тимир уонна Ньургун» | Оонньоо, кырааскалаа уонна бил!",
+            langBtn: "🇷🇺 Нууччалыы"
+        }
+    };
+
+    let currentLang = localStorage.getItem('appLanguage') || 'ru';
+    let board = ['', '', '', '', '', '', '', '', ''];
+    let currentPlayer = 'X';
+    let gameActive = true;
+    const winPatterns = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+    function createBoard() {
+        const boardEl = document.getElementById('board');
+        boardEl.innerHTML = '';
+        for (let i = 0; i < 9; i++) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.dataset.index = i;
+            cell.textContent = board[i];
+            cell.addEventListener('click', () => handleMove(i));
+            boardEl.appendChild(cell);
+        }
+    }
+
+    function handleMove(index) {
+        if (!gameActive || board[index] !== '') return;
+        makeMove(index, 'X');
+        if (gameActive) setTimeout(aiMove, 300);
+    }
+
+    function makeMove(index, player) {
+        board[index] = player;
+        updateBoard();
+        const t = translations[currentLang];
+        
+        if (checkWin(player)) {
+            document.getElementById('gameStatus').textContent = player === 'X' ? t.win : t.aiWin;
+            gameActive = false;
+            return;
+        }
+        if (board.every(cell => cell !== '')) {
+            document.getElementById('gameStatus').textContent = t.draw;
+            gameActive = false;
+            return;
+        }
+        currentPlayer = player === 'X' ? 'O' : 'X';
+        document.getElementById('gameStatus').textContent = currentPlayer === 'X' ? t.yourTurn : t.aiTurn;
+    }
+
+    function aiMove() {
+        if (!gameActive) return;
+        let empty = board.map((c, i) => c === '' ? i : null).filter(v => v !== null);
+        if (empty.length > 0) {
+            let randomIndex = empty[Math.floor(Math.random() * empty.length)];
+            makeMove(randomIndex, 'O');
+        }
+    }
+
+    function checkWin(player) {
+        return winPatterns.some(pattern => pattern.every(i => board[i] === player));
+    }
+
+    function updateBoard() {
+        const cells = document.querySelectorAll('.cell');
+        cells.forEach((cell, i) => cell.textContent = board[i]);
+    }
+
+    function resetGame() {
+        board = ['', '', '', '', '', '', '', '', ''];
+        currentPlayer = 'X';
+        gameActive = true;
+        updateBoard();
+        const t = translations[currentLang];
+        document.getElementById('gameStatus').textContent = t.yourTurn;
+        createBoard();
+    }
+
+    function updateLanguage() {
+        const t = translations[currentLang];
+        document.getElementById('navHome').textContent = t.navHome;
+        document.getElementById('navAbout').textContent = t.navAbout;
+        document.getElementById('navCharacters').textContent = t.navCharacters;
+        document.getElementById('navInteractive').textContent = t.navInteractive;
+        document.getElementById('navWatch').textContent = t.navWatch;
+        document.getElementById('navContacts').textContent = t.navContacts;
+        document.getElementById('sunLine1').textContent = t.sunLine1;
+        document.getElementById('sunLine2').textContent = t.sunLine2;
+        document.getElementById('gameTitle').innerHTML = t.gameTitle;
+        document.getElementById('resetGame').innerHTML = t.resetBtn;
+        document.getElementById('footerText').innerHTML = t.footer;
+        if (gameActive) {
+            document.getElementById('gameStatus').textContent = currentPlayer === 'X' ? t.yourTurn : t.aiTurn;
+        }
+        document.getElementById('langToggle').innerHTML = t.langBtn;
+    }
+
+    document.getElementById('resetGame').addEventListener('click', resetGame);
+    
+    const langBtn = document.getElementById('langToggle');
+    langBtn.addEventListener('click', () => {
+        currentLang = currentLang === 'ru' ? 'sah' : 'ru';
+        localStorage.setItem('appLanguage', currentLang);
+        updateLanguage();
+    });
+    
+    createBoard();
+    updateLanguage();
+</script>
+</body>
+</html>
